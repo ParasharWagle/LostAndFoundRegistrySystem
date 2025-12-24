@@ -7,7 +7,13 @@
  *
  * @author Lenovo
  */
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 public class maingui extends javax.swing.JFrame {
+    ArrayList<Item> itemList = new ArrayList<>();
+DefaultTableModel model;
+
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(maingui.class.getName());
 
@@ -15,6 +21,8 @@ public class maingui extends javax.swing.JFrame {
      * Creates new form maingui
      */
     public maingui() {
+        model = (DefaultTableModel) jTable1.getModel();
+
         initComponents();
     }
 
@@ -132,6 +140,11 @@ public class maingui extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(0, 102, 255));
         jButton1.setText("Add");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(0, 0, 0));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -142,6 +155,11 @@ public class maingui extends javax.swing.JFrame {
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton3.setForeground(new java.awt.Color(0, 102, 255));
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setBackground(new java.awt.Color(0, 0, 0));
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -238,16 +256,31 @@ public class maingui extends javax.swing.JFrame {
         jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton5.setForeground(new java.awt.Color(0, 102, 255));
         jButton5.setText("Search");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jButton6.setBackground(new java.awt.Color(204, 204, 204));
         jButton6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton6.setForeground(new java.awt.Color(0, 102, 255));
         jButton6.setText("Sort by ID");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         jButton7.setBackground(new java.awt.Color(204, 204, 204));
         jButton7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton7.setForeground(new java.awt.Color(0, 102, 255));
         jButton7.setText("Sort by Value");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -396,8 +429,55 @@ public class maingui extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField3ActionPerformed
 
     private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
-        // TODO add your handling code here:
+        String key = jTextField6.getText().toLowerCase();
+model.setRowCount(0);
+
+for(Item i:itemList){
+    if(i.getName().toLowerCase().contains(key)){
+        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getPrice()});
+    }
+}
+
     }//GEN-LAST:event_jTextField6ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       int id = Integer.parseInt(jTextField2.getText());
+String name = jTextField3.getText();
+String type = Lost.getSelectedItem().toString();
+double price = Double.parseDouble(jTextField5.getText());
+
+Item item = new Item(id,name,type,price);
+itemList.add(item);
+model.addRow(new Object[]{id,name,type,price});
+
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        itemList.sort((a,b)->a.getId()-b.getId());
+refreshTable();
+
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        itemList.sort((a,b)->Double.compare(a.getValue(),b.getValue()));
+refreshTable();
+
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        int row = jTable1.getSelectedRow();
+if(row>=0){
+    itemList.remove(row);
+    model.removeRow(row);
+    
+}
+
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -423,6 +503,16 @@ public class maingui extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new maingui().setVisible(true));
     }
+    private void refreshTable(){
+    model.setRowCount(0);
+    for(Item i:itemList){
+        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getPrice()});
+    }
+}
+
+
+
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> Lost;
@@ -457,3 +547,4 @@ public class maingui extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }
+  
