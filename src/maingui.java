@@ -155,6 +155,11 @@ DefaultTableModel model;
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton2.setForeground(new java.awt.Color(0, 102, 255));
         jButton2.setText("Update");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(0, 0, 0));
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -170,6 +175,11 @@ DefaultTableModel model;
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton4.setForeground(new java.awt.Color(0, 102, 255));
         jButton4.setText("Clear");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -376,9 +386,9 @@ DefaultTableModel model;
                 .addGap(33, 33, 33)
                 .addComponent(jLabel10)
                 .addGap(41, 41, 41)
-                .addComponent(jLabel11)
+                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
-                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -473,11 +483,14 @@ for(Item i:itemList){
        int id = Integer.parseInt(jTextField2.getText());
 String name = jTextField3.getText();
 String type = Lost.getSelectedItem().toString();
+String location = jTextField4.getText();
 double price = Double.parseDouble(jTextField5.getText());
 
-Item item = new Item(id,name,type,price);
+Item item = new Item(id,name,type,location,price);
 itemList.add(item);
-model.addRow(new Object[]{id,name,type,price});
+model.addRow(new Object[]{id,name,type,location,price});
+updateSummary();
+
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -489,8 +502,10 @@ refreshTable();
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        itemList.sort((a,b)->Double.compare(a.getValue(),b.getValue()));
+      itemList.sort((a,b)->Double.compare(a.getPrice(),b.getPrice()));
 refreshTable();
+
+
 
     }//GEN-LAST:event_jButton7ActionPerformed
 
@@ -505,8 +520,42 @@ if(row>=0){
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        String key = jTextField6.getText().toLowerCase();
+model.setRowCount(0);
+
+for(Item i:itemList){
+    if(i.getName().toLowerCase().contains(key) || String.valueOf(i.getId()).contains(key)){
+        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getLocation(),i.getPrice()});
+    }
+}
+
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        int row = jTable1.getSelectedRow();
+if(row>=0){
+    Item i = itemList.get(row);
+    i = new Item(
+        Integer.parseInt(jTextField2.getText()),
+        jTextField3.getText(),
+        Lost.getSelectedItem().toString(),
+        jTextField4.getText(),
+        Double.parseDouble(jTextField5.getText())
+    );
+    itemList.set(row,i);
+    refreshTable();
+    updateSummary();
+}
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        jTextField2.setText("");
+jTextField3.setText("");
+jTextField4.setText("");
+jTextField5.setText("");
+
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -535,9 +584,28 @@ if(row>=0){
     private void refreshTable(){
     model.setRowCount(0);
     for(Item i:itemList){
-        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getPrice()});
+        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getLocation(),i.getPrice()});
     }
 }
+
+
+    private void updateSummary(){
+    jLabel9.setText("Total Records: " + itemList.size());
+
+    int lost=0, found=0;
+    double sum=0;
+
+    for(Item i:itemList){
+        sum+=i.getPrice();
+        if(i.getType().equalsIgnoreCase("Lost")) lost++;
+        else found++;
+    }
+
+    jLabel10.setText("Total Lost Items: " + lost);
+    jLabel11.setText("Total Found Items: " + found);
+    jLabel12.setText("Average Value: " + (itemList.size()==0?0:sum/itemList.size()));
+}
+
 
 
 
@@ -579,5 +647,6 @@ if(row>=0){
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
+
 }
   
