@@ -7,22 +7,28 @@
  *
  * @author Lenovo
  */
-import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import java.util.LinkedList;
 import javax.swing.table.DefaultTableModel;
 
+    
+
 public class maingui extends javax.swing.JFrame {
-    ArrayList<Item> itemList = new ArrayList<>();
-DefaultTableModel model;
+    private final ItemController controller;
+private final DefaultTableModel model;
 
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(maingui.class.getName());
+    private Iterable<Item> itemList;
 
     /**
      * Creates new form maingui
      */
     public maingui() {
-        initComponents();
-        model = (DefaultTableModel) jTable1.getModel();
+         initComponents();
+     controller = new ItemController();
+     model = (DefaultTableModel) jTable1.getModel();
+        jTable1.setRowSelectionAllowed(false);
 
         
     }
@@ -473,36 +479,39 @@ model.setRowCount(0);
 
 for(Item i:itemList){
     if(i.getName().toLowerCase().contains(key)){
-        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getPrice()});
+        model.addRow(new Object[]{i.getId(), i.getName(), i.getType(), i.getLocation(), i.getPrice()});
+
     }
 }
 
     }//GEN-LAST:event_jTextField6ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       int id = Integer.parseInt(jTextField2.getText());
+    if (!validateInput()) return;
+
+int id = Integer.parseInt(jTextField2.getText());
 String name = jTextField3.getText();
 String type = Lost.getSelectedItem().toString();
 String location = jTextField4.getText();
 double price = Double.parseDouble(jTextField5.getText());
 
-Item item = new Item(id,name,type,location,price);
-itemList.add(item);
-model.addRow(new Object[]{id,name,type,location,price});
-updateSummary();
+if (controller.addItem(id, name, type, location, price)) {
+    refreshTable();
+    updateSummary();
+    clearFields();
 
 
-
+}
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        itemList.sort((a,b)->a.getId()-b.getId());
+        controller.sortById();
 refreshTable();
 
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-      itemList.sort((a,b)->Double.compare(a.getPrice(),b.getPrice()));
+     controller.sortByValue();
 refreshTable();
 
 
@@ -510,50 +519,60 @@ refreshTable();
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        int row = jTable1.getSelectedRow();
-if(row>=0){
-    itemList.remove(row);
-    model.removeRow(row);
-    
+String idText = jTextField2.getText().trim();
+if (idText.isEmpty()) {
+    JOptionPane.showMessageDialog(this, "Enter Record ID!");
+    return;
 }
 
+int id = Integer.parseInt(idText);
+
+if (controller.deleteItem(id)) {
+    refreshTable();
+    updateSummary();
+    clearFields();
+    JOptionPane.showMessageDialog(this, "Deleted!");
     }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        String key = jTextField6.getText().toLowerCase();
-model.setRowCount(0);
-
-for(Item i:itemList){
-    if(i.getName().toLowerCase().contains(key) || String.valueOf(i.getId()).contains(key)){
-        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getLocation(),i.getPrice()});
     }
-}
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        String keyword = jTextField6.getText();
+LinkedList<Item> results = controller.searchItems(keyword);
+
+model.setRowCount(0);
+for (Item item : results) {
+    model.addRow(new Object[]{item.getId(), item.getName(), 
+                 item.getType(), item.getLocation(), item.getPrice()});
+    }
+
 
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        int row = jTable1.getSelectedRow();
-if(row>=0){
-    Item i = itemList.get(row);
-    i = new Item(
-        Integer.parseInt(jTextField2.getText()),
-        jTextField3.getText(),
-        Lost.getSelectedItem().toString(),
-        jTextField4.getText(),
-        Double.parseDouble(jTextField5.getText())
-    );
-    itemList.set(row,i);
-    refreshTable();
-    updateSummary();
+ String idText = jTextField2.getText().trim();
+if (idText.isEmpty()) {
+    JOptionPane.showMessageDialog(this, "Enter Record ID!");
+    return;
 }
 
-    }//GEN-LAST:event_jButton2ActionPerformed
+int id = Integer.parseInt(idText);
+String name = jTextField3.getText();
+String type = Lost.getSelectedItem().toString();
+String location = jTextField4.getText();
+double price = Double.parseDouble(jTextField5.getText());
 
+if (controller.updateItem(id, name, type, location, price)) {
+    refreshTable();
+    updateSummary();
+    JOptionPane.showMessageDialog(this, "Updated!");
+    }//GEN-LAST:event_jButton2ActionPerformed
+}
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        jTextField2.setText("");
+jTextField2.setText("");
 jTextField3.setText("");
 jTextField4.setText("");
 jTextField5.setText("");
+jTextField2.requestFocus();
+
 
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -579,31 +598,52 @@ jTextField5.setText("");
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new maingui().setVisible(true));
+       java.awt.EventQueue.invokeLater(() -> {
+        new maingui().setVisible(true);
+    });
     }
+    private boolean validateInput(){
+
+    if (jTextField2.getText().isEmpty() || jTextField3.getText().isEmpty() ||
+        jTextField4.getText().isEmpty() || jTextField5.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "All fields required!");
+        return false;
+    }
+    
+    if (!controller.isValidInteger(jTextField2.getText())) {
+        JOptionPane.showMessageDialog(this, "ID must be number!");
+        return false;
+    }
+    
+    if (!controller.isValidDouble(jTextField5.getText())) {
+        JOptionPane.showMessageDialog(this, "Value must be number!");
+        return false;
+    }
+    
+    return true;
+}
+
     private void refreshTable(){
     model.setRowCount(0);
-    for(Item i:itemList){
-        model.addRow(new Object[]{i.getId(),i.getName(),i.getType(),i.getLocation(),i.getPrice()});
+    LinkedList<Item> items = controller.getAllItems();
+    for (Item item : items) {
+        model.addRow(new Object[]{item.getId(), item.getName(), 
+                     item.getType(), item.getLocation(), item.getPrice()});
     }
 }
 
 
     private void updateSummary(){
-    jLabel9.setText("Total Records: " + itemList.size());
-
-    int lost=0, found=0;
-    double sum=0;
-
-    for(Item i:itemList){
-        sum+=i.getPrice();
-        if(i.getType().equalsIgnoreCase("Lost")) lost++;
-        else found++;
-    }
-
-    jLabel10.setText("Total Lost Items: " + lost);
-    jLabel11.setText("Total Found Items: " + found);
-    jLabel12.setText("Average Value: " + (itemList.size()==0?0:sum/itemList.size()));
+    jLabel9.setText("Total Records: " + controller.getTotalItems());
+    jLabel10.setText("Total Lost Items: " + controller.getLostItemsCount());
+    jLabel11.setText("Total Found Items: " + controller.getFoundItemsCount());
+    jLabel12.setText("Average Value: " + controller.getAverageValue());
+}
+    private void clearFields() {
+    jTextField2.setText("");
+    jTextField3.setText("");
+    jTextField4.setText("");
+    jTextField5.setText("");
 }
 
 
@@ -649,4 +689,3 @@ jTextField5.setText("");
     // End of variables declaration//GEN-END:variables
 
 }
-  
