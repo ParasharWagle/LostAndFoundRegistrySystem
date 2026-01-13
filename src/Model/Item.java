@@ -1,3 +1,7 @@
+package Model;
+
+
+
 public class Item {
 
     private int id;
@@ -19,4 +23,6 @@ public class Item {
     public String getType(){ return type; }
     public String getLocation(){ return location; }
     public double getPrice(){ return price; }
+
+    
 }

@@ -1,3 +1,5 @@
+package Controller;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -7,17 +9,24 @@
  *
  * @author Lenovo
  */
+import Model.Item;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 
 public class ItemController {
     
     // Data storage (Model layer)
     private final LinkedList<Item> itemList;
+    private final java.util.Queue<Item> claimQueue;
+    Stack<Item> undoStack = new Stack<>();
+
     
     // Constructor
     public ItemController() {
         this.itemList = new LinkedList<>();
+        this.claimQueue = new java.util.LinkedList<>();
     }
     
     
@@ -74,6 +83,7 @@ public class ItemController {
     public boolean deleteItem(int id) {
         for (int i = 0; i < itemList.size(); i++) {
             if (itemList.get(i).getId() == id) {
+                undoStack.push(itemList.get(i));
                 itemList.remove(i);
                 return true;
             }
@@ -118,10 +128,7 @@ public class ItemController {
         return count;
     }
     
-    /**
-     * Gets count of found items
-     * @return 
-     */
+  
     public int getFoundItemsCount() {
         int count = 0;
         for (Item item : itemList) {
@@ -132,7 +139,7 @@ public class ItemController {
         return count;
     }
     
-   
+    
     public double getAverageValue() {
         if (itemList.isEmpty()) {
             return 0.0;
@@ -145,6 +152,7 @@ public class ItemController {
         return sum / itemList.size();
     }
     
+   
     private boolean isDuplicateId(int id) {
         for (Item item : itemList) {
             if (item.getId() == id) {
@@ -153,6 +161,7 @@ public class ItemController {
         }
         return false;
     }
+    
     
     public boolean isValidInteger(String str) {
         try {
@@ -163,7 +172,7 @@ public class ItemController {
         }
     }
     
-    
+   
     public boolean isValidDouble(String str) {
         try {
             Double.valueOf(str);
@@ -172,4 +181,40 @@ public class ItemController {
             return false;
         }
     }
+    public Item searchById(int id){
+    for(Item i : itemList){
+        if(i.getId()==id) return i;
+    }
+    return null;
+}
+
+    public void pushUndo(Item i){
+    undoStack.push(i);
+}
+
+public Item undoLast(){
+    if(undoStack.isEmpty()) return null;
+    return undoStack.pop();
+}
+public boolean addToClaimQueue(int id) {
+    Item i = getItemById(id);
+    if (i == null) return false;
+
+    if (claimQueue.contains(i)) return false;
+    claimQueue.add(i);
+    return true;
+}
+
+public Item processNextClaim() {
+    return claimQueue.poll();
+}
+
+public java.util.Queue<Item> getClaimQueue() {
+    return claimQueue;
+}
+
+
+    
+
+    
 }
