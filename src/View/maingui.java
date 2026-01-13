@@ -650,12 +650,17 @@ jTextField2.requestFocus();
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
 
-        if(controller.undoLastAction()){
+    Item i = controller.undoLastAction();
+
+if(i != null){
+    controller.getAllItems().add(i);   // restore item
     refreshTable();
-    JOptionPane.showMessageDialog(this, "Last action undone!");
-}else{
+    updateSummary();
+    JOptionPane.showMessageDialog(this, "Undo successful!");
+} else {
     JOptionPane.showMessageDialog(this, "Nothing to undo!");
 }
+
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
@@ -672,27 +677,14 @@ if(i!=null){
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-       String idText = jTextField2.getText().trim();
-      
+      int id = Integer.parseInt(jTextField2.getText());
 
-if(idText.isEmpty()){
-    JOptionPane.showMessageDialog(this,"Enter Item ID to claim");
-    return;
-    
+if(controller.addToClaimQueue(id)){
+    JOptionPane.showMessageDialog(this, "Item added to claim queue.");
+    refreshQueueTable();
+} else {
+    JOptionPane.showMessageDialog(this, "Invalid ID or already claimed.");
 }
-
-int id = Integer.parseInt(idText);
-
-Item i = controller.searchById(id);
-
-if(i==null){
-    JOptionPane.showMessageDialog(this,"Item not found");
-    return;
-}
-
-controller.addClaim(i);
-JOptionPane.showMessageDialog(this,"Item added to claim queue!");
- refreshQueueTable();
 
     }//GEN-LAST:event_jButton10ActionPerformed
 

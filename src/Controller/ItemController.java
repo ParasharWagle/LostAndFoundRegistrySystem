@@ -82,10 +82,10 @@ public class ItemController {
     
     public boolean deleteItem(int id) {
         for (int i = 0; i < itemList.size(); i++) {
-            if (itemList.get(i).getId() == id) {
-                undoStack.push(itemList.get(i));
-                itemList.remove(i);
-                return true;
+        if (itemList.get(i).getId() == id) {
+            undoStack.push(itemList.get(i));   // save for undo
+            itemList.remove(i);
+            return true;
             }
         }
         return false;
@@ -107,12 +107,31 @@ public class ItemController {
     
     
     public void sortById() {
-        itemList.sort((a, b) -> a.getId() - b.getId());
+        int n = itemList.size();
+
+for(int i = 0; i < n - 1; i++){
+    for(int j = 0; j < n - i - 1; j++){
+        if(itemList.get(j).getId() > itemList.get(j + 1).getId()){
+            Item temp = itemList.get(j);
+            itemList.set(j, itemList.get(j + 1));
+            itemList.set(j + 1, temp);
+        }
+    }
+}
     }
     
    
     public void sortByValue() {
-        itemList.sort((a, b) -> Double.compare(a.getPrice(), b.getPrice()));
+        for(int i = 1; i < itemList.size(); i++){
+    Item key = itemList.get(i);
+    int j = i - 1;
+
+    while(j >= 0 && itemList.get(j).getPrice() > key.getPrice()){
+        itemList.set(j + 1, itemList.get(j));
+        j--;
+    }
+    itemList.set(j + 1, key);
+}
     }
     
     
@@ -199,7 +218,6 @@ public Item undoLast(){
 public boolean addToClaimQueue(int id) {
     Item i = getItemById(id);
     if (i == null) return false;
-
     if (claimQueue.contains(i)) return false;
     claimQueue.add(i);
     return true;
@@ -212,6 +230,16 @@ public Item processNextClaim() {
 public java.util.Queue<Item> getClaimQueue() {
     return claimQueue;
 }
+public void saveUndo(Item i) {
+    undoStack.push(i);
+}
+
+public Item undoLastAction() {
+    if (undoStack.isEmpty()) return null;
+    return undoStack.pop();
+}
+
+   
 
 
     
