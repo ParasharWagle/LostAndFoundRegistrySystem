@@ -20,6 +20,9 @@ public class ItemController {
     // Data storage (Model layer)
     private final LinkedList<Item> itemList;
     private final java.util.Queue<Item> claimQueue;
+    private final java.util.Queue<Item> recentQueue = new java.util.LinkedList<>();
+
+
     Stack<Item> undoStack = new Stack<>();
 
     
@@ -44,8 +47,15 @@ public class ItemController {
         // Create and add item
         Item item = new Item(id, name, type, location, price);
         itemList.add(item);
+        recentQueue.add(item);
+if (recentQueue.size() > 5) recentQueue.poll();
+
         return true;
     }
+    public Queue<Item> getRecentItems(){
+    return recentQueue;
+}
+
     
    
     public LinkedList<Item> getAllItems() {
@@ -217,8 +227,12 @@ public Item undoLast(){
 }
 public boolean addToClaimQueue(int id) {
     Item i = getItemById(id);
-    if (i == null) return false;
-    if (claimQueue.contains(i)) return false;
+    if(i == null) return false;
+
+    for(Item q : claimQueue){
+        if(q.getId() == id) return false;   // already in queue
+    }
+
     claimQueue.add(i);
     return true;
 }
@@ -238,6 +252,24 @@ public Item undoLastAction() {
     if (undoStack.isEmpty()) return null;
     return undoStack.pop();
 }
+public Item binarySearchById(int id) {
+    int low = 0, high = itemList.size() - 1;
+
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        Item midItem = itemList.get(mid);
+
+        if (midItem.getId() == id) return midItem;
+        else if (midItem.getId() < id) low = mid + 1;
+        else high = mid - 1;
+    }
+    return null;
+}
+public java.util.Queue<Item> getRecentQueue(){
+    return recentQueue;
+}
+
+
 
    
 
