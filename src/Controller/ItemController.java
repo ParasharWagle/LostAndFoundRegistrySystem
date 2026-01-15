@@ -47,7 +47,8 @@ public class ItemController {
         // Create and add item
         Item item = new Item(id, name, type, location, price);
         itemList.add(item);
-        recentQueue.add(item);
+    undoStack.push(item);          
+    recentQueue.add(item);
 if (recentQueue.size() > 5) recentQueue.poll();
 
         return true;

@@ -606,10 +606,11 @@ if (controller.addItem(id, name, type, location, price)) {
     updateSummary();
     clearFields();
     refreshRecentTable();
-
-
-
+} else {
+    JOptionPane.showMessageDialog(this,"Record ID already exists!");
 }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -776,9 +777,12 @@ if(controller.addToClaimQueue(id)){
         //</editor-fold>
 
         /* Create and display the form */
-       java.awt.EventQueue.invokeLater(() -> {
+       java.awt.EventQueue.invokeLater(new Runnable() {
+    @Override
+    public void run() {
         new maingui().setVisible(true);
-    });
+    }
+});
     }
     private boolean validateInput(){
 
