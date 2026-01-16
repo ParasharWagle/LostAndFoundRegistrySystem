@@ -253,22 +253,47 @@ public Item undoLastAction() {
     if (undoStack.isEmpty()) return null;
     return undoStack.pop();
 }
-public Item binarySearchById(int id) {
-    int low = 0, high = itemList.size() - 1;
+public Item binarySearchById(int searchId) {
+
+    bubbleSortById();   
+
+    int low = 0;
+    int high = itemList.size() - 1;
 
     while (low <= high) {
         int mid = (low + high) / 2;
-        Item midItem = itemList.get(mid);
+        int midId = itemList.get(mid).getId();
 
-        if (midItem.getId() == id) return midItem;
-        else if (midItem.getId() < id) low = mid + 1;
-        else high = mid - 1;
+        if (midId == searchId) {
+            return itemList.get(mid);
+        } else if (midId < searchId) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
     return null;
 }
+
 public java.util.Queue<Item> getRecentQueue(){
     return recentQueue;
 }
+private void bubbleSortById() {
+    int n = itemList.size();
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+
+            if (itemList.get(j).getId() > itemList.get(j + 1).getId()) {
+                // swap
+                Item temp = itemList.get(j);
+                itemList.set(j, itemList.get(j + 1));
+                itemList.set(j + 1, temp);
+            }
+        }
+    }
+}
+
 
 
 
