@@ -730,32 +730,35 @@ if(controller.addToClaimQueue(id)){
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        String txt = jTextField2.getText().trim();
+        String idText = jButton11.getText().trim();
 
-    if(txt.isEmpty()){
-        JOptionPane.showMessageDialog(this, "Please enter Record ID for Binary Search");
-        return;
-    }
+if (idText.isEmpty()) {
+    JOptionPane.showMessageDialog(this, "Enter ID to search");
+    return;
+}
 
-    if(!controller.isValidInteger(txt)){
-        JOptionPane.showMessageDialog(this, "Record ID must be a number");
-        return;
-    }
+int id;
+try {
+    id = Integer.parseInt(idText);
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(this, "ID must be a number");
+    return;
+}
 
-    int id = Integer.parseInt(txt);
+Item result = controller.binarySearchById(id);
 
-    Item i = controller.binarySearchById(id);
+if (result == null) {
+    JOptionPane.showMessageDialog(this, "Item not found");
+} else {
+    JOptionPane.showMessageDialog(this,
+        "Found:\n" +
+        "Name: " + result.getName() +
+        "\nType: " + result.getType() +
+        "\nLocation: " + result.getLocation() +
+        "\nPrice: " + result.getPrice()
+    );
+}
 
-    if(i != null){
-        JOptionPane.showMessageDialog(this,
-                "Found:\nID: " + i.getId() +
-                "\nName: " + i.getName() +
-                "\nType: " + i.getType() +
-                "\nLocation: " + i.getLocation() +
-                "\nValue: " + i.getPrice());
-    } else {
-        JOptionPane.showMessageDialog(this, "Record not found!");
-    }
 
     }//GEN-LAST:event_jButton11ActionPerformed
 

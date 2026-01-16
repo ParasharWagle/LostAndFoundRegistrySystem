@@ -53,6 +53,26 @@ if (recentQueue.size() > 5) recentQueue.poll();
 
         return true;
     }
+    public LinkedList<Item> searchItems(String keyword) {
+
+    LinkedList<Item> results = new LinkedList<>();
+
+    if (keyword == null || keyword.isEmpty()) {
+        return results;
+    }
+
+    for (Item item : itemList) {
+
+        
+        if (item.getName().toLowerCase().contains(keyword.toLowerCase())
+                || String.valueOf(item.getId()).equals(keyword)) {
+
+            results.add(item);
+        }
+    }
+    return results;
+}
+
     public Queue<Item> getRecentItems(){
     return recentQueue;
 }
@@ -103,18 +123,7 @@ if (recentQueue.size() > 5) recentQueue.poll();
     }
     
    
-    public LinkedList<Item> searchItems(String keyword) {
-        LinkedList<Item> results = new LinkedList<>();
-        String searchKey = keyword.toLowerCase();
-        
-        for (Item item : itemList) {
-            if (item.getName().toLowerCase().contains(searchKey) || 
-                String.valueOf(item.getId()).contains(searchKey)) {
-                results.add(item);
-            }
-        }
-        return results;
-    }
+  
     
     
     public void sortById() {
