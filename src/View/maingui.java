@@ -505,13 +505,13 @@ private final DefaultTableModel model;
 
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Queue No", "Record ID ", "Item Name"
+                "Record ID ", "Item Name"
             }
         ));
         jScrollPane3.setViewportView(jTable3);
